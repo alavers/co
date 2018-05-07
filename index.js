@@ -118,7 +118,7 @@ function toPromise(obj) {
   if (isPromise(obj)) return obj;
   if (isGeneratorFunction(obj) || isGenerator(obj)) return co.call(this, obj);
   if ('function' == typeof obj) return thunkToPromise.call(this, obj);
-  if (Array.isArray(obj)) return arrayToPromise.call(this, obj);
+  if (Array.isArray(obj)) throw new Error('Attempted to yield an array. You must use Promise.all');
   if (isObject(obj)) return objectToPromise.call(this, obj);
   return obj;
 }
@@ -140,19 +140,6 @@ function thunkToPromise(fn) {
       resolve(res);
     });
   });
-}
-
-/**
- * Convert an array of "yieldables" to a promise.
- * Uses `Promise.all()` internally.
- *
- * @param {Array} obj
- * @return {Promise}
- * @api private
- */
-
-function arrayToPromise(obj) {
-  return Promise.all(obj.map(toPromise, this));
 }
 
 /**
